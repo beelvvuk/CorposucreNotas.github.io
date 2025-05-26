@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora de Notas - CORPOSUCRE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        table {
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            min-width: 80px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 0.9em;
+        }
+        input {
+            width: 60px;
+            padding: 3px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .non-editable {
+            background-color: #f5f5f5;
+        }
+        .warning {
+            background-color: #fff3cd;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Calculadora de Notas Académicas</h2>
+    
+    <table id="notasTable">
+        <!-- Encabezados de la tabla -->
+        <tr>
+            <th>ASIGNATURA</th>
+            <th colspan="9">PRIMER CORTE</th>
+            <th colspan="9">SEGUNDO CORTE</th>
+            <th colspan="4">RESULTADOS</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th>ACT 1</th>
+            <th>ACT 2</th>
+            <th>ACT 3</th>
+            <th>ACT 20%</th>
+            <th>PARCIAL 20%</th>
+            <th>NOTA CORTE 40%</th>
+            <th>VALOR CORTE</th>
+            <th>ACT 1</th>
+            <th>ACT 2</th>
+            <th>ACT 3</th>
+            <th>ACT 25%</th>
+            <th>PARCIAL 35%</th>
+            <th>NOTA CORTE 60%</th>
+            <th>VALOR CORTE</th>
+            <th>NOTA FINAL</th>
+            <th>SEMESTRE</th>
+            <th>APRUEBA</th>
+            <th>DESEMPEÑO</th>
+        </tr>
+        
+        <!-- Filas de asignaturas -->
+        <tbody id="asignaturas">
+            <!-- Se generan 9 filas para asignaturas -->
+            <script>
+                for(let i = 0; i < 9; i++) {
+                    document.write(`
+                        <tr>
+                            <!-- Asignatura -->
+                            <td><input type="text" class="asignatura"></td>
+                            
+                            <!-- Primer Corte -->
+                            <td><input type="number" min="0" max="5" step="0.01" class="act1"></td>
+                            <td><input type="number" min="0" max="5" step="0.01" class="act2"></td>
+                            <td><input type="number" min="0" max="5" step="0.01" class="act3"></td>
+                            <td class="non-editable act20">0.00</td>
+                            <td><input type="number" min="0" max="5" step="0.01" class="parcial20"></td>
+                            <td class="non-editable nota-corte1">0.00</td>
+                            <td class="non-editable valor-corte1">0.00</td>
+                            
+                            <!-- Segundo Corte -->
+                            <td><input type="number" min="0" max="5" step="0.01" class="act1-2"></td>
+                            <td><input type="number" min="0" max="5" step="0.01" class="act2-2"></td>
+                            <td><input type="number" min="0" max="5" step="0.01" class="act3-2"></td>
+                            <td class="non-editable act25">0.00</td>
+                            <td><input type="number" min="0" max="5" step="0.01" class="parcial35"></td>
+                            <td class="non-editable nota-corte2">0.00</td>
+                            <td class="non-editable valor-corte2">0.00</td>
+                            
+                            <!-- Resultados -->
+                            <td class="non-editable nota-final">0.00</td>
+                            <td class="non-editable">1</td>
+                            <td class="non-editable aprueba">NO</td>
+                            <td class="non-editable desempeno">Bajo (B)</td>
+                        </tr>
+                    `);
+                }
+            </script>
+        </tbody>
+        
+        <!-- Promedio del semestre -->
+        <tr>
+            <td colspan="16" class="non-editable">PROMEDIO SEMESTRE</td>
+            <td class="non-editable" id="promedio-semestre">0.00</td>
+            <td class="non-editable" id="desempeno-semestre">Bajo (B)</td>
+        </tr>
+    </table>
+
+    <div class="warning">
+        <h3>Advertencia:</h3>
+        <p>Las notas entre 2.95 y 2.99 deben ser aproximadas a 3.0 según el Art. 84 del reglamento estudiantil.</p>
+    </div>
+
+    <script>
+        // Función para calcular todas las notas
+        function calcularNotas() {
+            let rows = document.querySelectorAll('#asignaturas tr');
+            let totalNotas = 0;
+            let totalAsignaturas = 0;
+
+            rows.forEach(row => {
+                // Primer Corte
+                let act1 = parseFloat(row.querySelector('.act1').value) || 0;
+                let act2 = parseFloat(row.querySelector('.act2').value) || 0;
+                let act3 = parseFloat(row.querySelector('.act3').value) || 0;
+                let countActs = [act1, act2, act3].filter(a => a > 0).length;
+                let act20 = countActs > 0 ? (act1 + act2 + act3) / countActs : 0;
+                row.querySelector('.act20').textContent = act20.toFixed(2);
+
+                let parcial20 = parseFloat(row.querySelector('.parcial20').value) || 0;
+                let notaCorte1 = ((act20 * 0.2) + (parcial20 * 0.2)) / 0.4;
+                row.querySelector('.nota-corte1').textContent = notaCorte1.toFixed(2);
+                let valorCorte1 = notaCorte1 * 0.4;
+                row.querySelector('.valor-corte1').textContent = valorCorte1.toFixed(2);
+
+                // Segundo Corte
+                let act1_2 = parseFloat(row.querySelector('.act1-2').value) || 0;
+                let act2_2 = parseFloat(row.querySelector('.act2-2').value) || 0;
+                let act3_2 = parseFloat(row.querySelector('.act3-2').value) || 0;
+                let countActs2 = [act1_2, act2_2, act3_2].filter(a => a > 0).length;
+                let act25 = countActs2 > 0 ? (act1_2 + act2_2 + act3_2) / countActs2 : 0;
+                row.querySelector('.act25').textContent = act25.toFixed(2);
+
+                let parcial35 = parseFloat(row.querySelector('.parcial35').value) || 0;
+                let notaCorte2 = ((act25 * 0.25) + (parcial35 * 0.35)) / 0.6;
+                notaCorte2 = Math.floor(notaCorte2 * 10) / 10; // Redondeo hacia abajo
+                row.querySelector('.nota-corte2').textContent = notaCorte2.toFixed(2);
+                let valorCorte2 = notaCorte2 * 0.6;
+                row.querySelector('.valor-corte2').textContent = valorCorte2.toFixed(2);
+
+                // Nota Final
+                let notaFinal = valorCorte1 + valorCorte2;
+                notaFinal = redondearNota(notaFinal);
+                row.querySelector('.nota-final').textContent = notaFinal.toFixed(2);
+
+                // Determinar aprobación y desempeño
+                let aprueba = notaFinal >= 2.95 ? 'SI' : 'NO';
+                let desempeno = calcularDesempeno(notaFinal);
+                row.querySelector('.aprueba').textContent = aprueba;
+                row.querySelector('.desempeno').textContent = desempeno;
+
+                // Acumular para promedio
+                if(notaFinal > 0) {
+                    totalNotas += notaFinal;
+                    totalAsignaturas++;
+                }
+            });
+
+            // Calcular promedio del semestre
+            let promedio = totalAsignaturas > 0 ? totalNotas / totalAsignaturas : 0;
+            promedio = redondearNota(promedio);
+            document.getElementById('promedio-semestre').textContent = promedio.toFixed(2);
+            document.getElementById('desempeno-semestre').textContent = calcularDesempeno(promedio);
+        }
+
+        // Función de redondeo según reglamento
+        function redondearNota(nota) {
+            let decimal = Math.round((nota % 1) * 100);
+            return decimal >= 95 ? Math.ceil(nota * 10) / 10 : Math.floor(nota * 10) / 10;
+        }
+
+        // Función para determinar desempeño
+        function calcularDesempeno(nota) {
+            if(nota <= 2.94) return 'Bajo (B)';
+            if(nota <= 3.44) return 'Básico (BS)';
+            if(nota <= 4.04) return 'Alto (A)';
+            if(nota <= 4.54) return 'Superior (S)';
+            return 'Sobresaliente (SB)';
+        }
+
+        // Event listeners para actualización en tiempo real
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', calcularNotas);
+        });
+
+        // Calcular inicialmente
+        calcularNotas();
+    </script>
+</body>
+</html>
